@@ -17,21 +17,12 @@ const httpOptions = {
 @Injectable({ providedIn: 'root' })
 export class HeroService {
 
-  // private heroesUrl = 'api/heroes';  // URL to web api
-heroes:any;
+  heroes: any;
   constructor(
     private http: HttpClient,
     private messageService: MessageService,
-  private _http: Http) { }
+    private _http: Http) { }
 
-  /** GET heroes from the server */
-  // getHeroes (): Observable<Hero[]> {
-  //   return this.http.get<Hero[]>(this.heroesUrl)
-  //     .pipe(
-  //       tap(heroes => this.log(`fetched heroes`)),
-  //       catchError(this.handleError('getHeroes', []))
-  //     );
-  // }
 
   getHeroes() {
     return this._http.get("/api/heroes")
@@ -53,7 +44,7 @@ heroes:any;
   }
 
   /** GET hero by id. Will 404 if id not found */
-  getHero(id: number){
+  getHero(id: number) {
     const url = `/api/heroes/${id}`;
     return this._http.get(url).pipe(
       tap(_ => this.log(`fetched hero id=${id}`)),
@@ -76,7 +67,7 @@ heroes:any;
   //////// Save methods //////////
 
   /** POST: add a new hero to the server */
-  addHero (hero: any) {
+  addHero(hero: any) {
     return this._http.post("/api/heroes", hero, httpOptions).pipe(
       tap((hero: any) => this.log(`added hero w/ id=${hero.id}`)),
       catchError(this.handleError('addHero'))
@@ -84,7 +75,7 @@ heroes:any;
   }
 
   /** DELETE: delete the hero from the server */
-  deleteHero (hero: any){
+  deleteHero(hero: any) {
     const id = typeof hero === 'number' ? hero : hero.id;
     const url = `/api/heroes/${id}`;
 
@@ -95,7 +86,7 @@ heroes:any;
   }
 
   /** PUT: update the hero on the server */
-  updateHero (hero: any) {
+  updateHero(hero: any) {
     return this._http.put("/api/heroes", hero, httpOptions).pipe(
       tap(_ => this.log(`updated hero id=${hero.id}`)),
       catchError(this.handleError<any>('updateHero'))
@@ -108,7 +99,7 @@ heroes:any;
    * @param operation - name of the operation that failed
    * @param result - optional value to return as the observable result
    */
-  private handleError<T> (operation = 'operation', result?: T) {
+  private handleError<T>(operation = 'operation', result?: T) {
     return (error: any) => {
 
       // TODO: send the error to remote logging infrastructure
