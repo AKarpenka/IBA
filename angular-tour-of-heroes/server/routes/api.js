@@ -4,67 +4,76 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 const bodyParser = require('body-parser');
 
-//чтобы правильно парсить json, который передали в body
+
 router.use(bodyParser.json());
-//чтобы правильно парсить данные формы
-router.use(bodyParser.urlencoded({ extended: true }));
+router.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 // Connect
 const connection = (closure) => {
-    return MongoClient.connect('mongodb://Nastya:12345n@ds253783.mlab.com:53783/heroes',{ useNewUrlParser: true }, (err, db) => {
-        if (err) return console.log(err);
+  return MongoClient.connect('mongodb://Nastya:12345n@ds253783.mlab.com:53783/heroes', {
+    useNewUrlParser: true
+  }, (err, db) => {
+    if (err) return console.log(err);
 
-        let dbo = db.db("heroes");
-        closure(dbo);
-    });
+    let dbo = db.db("heroes");
+    closure(dbo);
+  });
 };
+
+
 
 // Error handling
 const sendError = (err, res) => {
-    response.status = 501;
-    response.message = typeof err == 'object' ? err.message : err;
-    res.status(501).json(response);
+  response.status = 501;
+  response.message = typeof err == 'object' ? err.message : err;
+  res.status(501).json(response);
 };
 
 // Response handling
 let response = {
-    status: 200,
-    data: [],
-    message: null
+  status: 200,
+  data: [],
+  message: null
 };
 
 // Get users
 router.get('/heroes', (req, res) => {
-    connection((dbo) => {
-        dbo.collection('heroes')
-            .find()
-            .toArray()
-            .then((heroes) => {
-                response.data = heroes;
-                res.json(response);
-            })
-            .catch((err) => {
-                sendError(err, res);
-            });
-    });
+  connection((dbo) => {
+    dbo.collection('heroes')
+      .find()
+      .toArray()
+      .then((heroes) => {
+        response.data = heroes;
+        res.json(response);
+      })
+      .catch((err) => {
+        sendError(err, res);
+      });
+  });
 });
 
 //add a hero to the database
-router.post('/heroes', function (req, res){
+router.post('/heroes', function(req, res) {
   connection((dbo) => {
-    dbo.collection('heroes').insert(hero, function (err, res) {
+    dbo.collection('heroes').insertOne(req.body, function(err, result) {
       if (err) {
         sendError(err, res);
       }
-      res.send(hero);
+      res.send(result.ops[0]);
     });
   });
 });
 
-//hero search
-router.get('/dashboard/:id', function (req, res) {
+//search one hero
+router.get('/detail/:id', function(req, res) {
   connection((dbo) => {
-    dbo.collection('heroes').findOne({ id: req.body.id }, function (err, doc) {
+    const id = req.params.id;
+    const details = {
+      '_id': new ObjectID(id)
+    };
+    dbo.collection('heroes').findOne(details, function(err, doc) {
       if (err) {
         sendError(err, res);
       }
@@ -73,37 +82,55 @@ router.get('/dashboard/:id', function (req, res) {
   });
 });
 
-//обновление героя
-router.put('/detail/:id', function (req, res) {
+//search one hero in dashboard
+router.get('/dashboard', function(req, res) {
   connection((dbo) => {
-    dbo.collection('heroes').updateOne(
-      //элемент, который находит
-      { id: req.body.id },
-      //что обновляем
-      { name: req.body.name },
-      function (err, result) {
+    dbo.collection('heroes').find(req.body.name)
+      .toArray()
+      .then((heroes) => {
+        response.data = heroes;
+        res.json(response);
+      })
+      .catch((err) => {
+        sendError(err, res);
+      });
+  });
+});
+
+//hero update
+router.put('/detail/:id', function(req, res) {
+  connection((dbo) => {
+    const _id = {
+      '_id': new ObjectID(req.body._id)
+    };
+    dbo.collection('heroes').update(
+      _id, {
+        "name": req.body.name
+      },
+      function(err, result) {
         if (err) {
           sendError(err, res);
+        } else {
+          res.send(result);
         }
-        // здесь нужен код, если все норм
       }
     );
   });
 });
 
-//удаление героя
-router.delete('/heroes/:id', function (req, res) {
+//hero removal
+router.delete('/heroes/:id', function(req, res) {
   connection((dbo) => {
-    dbo.collection('heroes').deleteOne(
-      //условие
-      { id: req.body.id },
-      function (err, result) {
-        if (err) {
-          sendError(err, res);
-        }
-        // здесь нужен код, если все норм
+    const id = req.params.id;
+    const details = {
+      '_id': new ObjectID(id)
+    };
+    dbo.collection('heroes').remove(details, function(err, result) {
+      if (err) {
+        sendError(err, res);
       }
-    );
+      res.send(result);
+    });
   });
 });
 

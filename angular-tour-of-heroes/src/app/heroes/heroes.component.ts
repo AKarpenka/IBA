@@ -9,7 +9,7 @@ import { HeroService } from '../hero.service';
   styleUrls: ['./heroes.component.css']
 })
 export class HeroesComponent implements OnInit {
-  heroes: Array<any>;
+  heroes: Hero[] = [];
 
 
   constructor(private heroService: HeroService) { }
@@ -23,17 +23,20 @@ export class HeroesComponent implements OnInit {
       .subscribe(heroes => this.heroes = heroes);
   }
 
-  add(name: string): void {
+  add(name): void {
     name = name.trim();
     if (!name) { return; }
-    this.heroService.addHero({ name })
+    let h = new Hero(name);
+    this.heroService.addHero(h)
       .subscribe(hero => {
         this.heroes.push(hero);
       });
   }
 
-  delete(hero): void {
-    this.heroes = this.heroes.filter(h => h !== hero);
-    this.heroService.deleteHero(hero).subscribe();
+  delete(id: string): void {
+    this.heroService.deleteHero(id).subscribe(o => {
+      let index = this.heroes.findIndex(elem => elem._id === id);
+      this.heroes.splice(index, 1);
+    });
   }
 }

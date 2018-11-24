@@ -1,4 +1,8 @@
 export class Hero {
-  id: number;
+  _id: string;
   name: string;
+
+  constructor(name){
+    this.name = name;
+  }
 }

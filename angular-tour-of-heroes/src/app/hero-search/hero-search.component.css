@@ -1,4 +1,8 @@
 /* HeroSearch private styles */
+#search-component{
+  display: block;
+}
+
 .search-result li {
   border-bottom: 1px solid gray;
   border-left: 1px solid gray;

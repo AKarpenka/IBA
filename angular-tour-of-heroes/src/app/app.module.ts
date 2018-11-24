@@ -10,12 +10,11 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { HttpClientModule } from '@angular/common/http';
 import { HttpClientInMemoryWebApiModule } from 'angular-in-memory-web-api';
-// import { InMemoryDataService } from './in-memory-data.service';///////////////////
+
 import { HeroSearchComponent } from './hero-search/hero-search.component';
 
 // Import the Http Module and our Data Service
 import { HttpModule } from '@angular/http';
-import { DataService } from './data.service';
 
 @NgModule({
   declarations: [
@@ -38,10 +37,9 @@ import { DataService } from './data.service';
 
     //////////
     // HttpClientInMemoryWebApiModule.forRoot(
-    //   InMemoryDataService, { dataEncapsulation: false }
-    // )
+
   ],
-  providers: [DataService
+  providers: [
     // no need to place any providers due to the `providedIn` flag...
   ],
   bootstrap: [AppComponent]
